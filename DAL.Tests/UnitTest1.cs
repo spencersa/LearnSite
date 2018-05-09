@@ -1,5 +1,4 @@
 using Dapper;
-using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -19,11 +18,11 @@ namespace DAL.Tests
         [Fact]
         public void Test1()
         {
-            var myConnectionString = "Server=localhost;Port=3306;Database=testdb;Uid=LearnSite;Pwd=cfdcada42723;";
+            var myConnectionString = "Server=localhost;Database=TestDb;User Id=LearnSite;Password=3964fd31d461;";
             List<TestModel> list = new List<TestModel>();
-            using (MySqlConnection db = new MySqlConnection(myConnectionString))
+            using (SqlConnection db = new SqlConnection(myConnectionString))
             {
-                string query = "Select * From tbl_test";
+                string query = "Select * From testTable";
                 list =  db.Query<TestModel>(query, commandType: CommandType.Text).ToList();
             }
         }

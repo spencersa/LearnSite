@@ -1,0 +1,7 @@
+﻿CREATE TABLE tblPosts (
+	Id INT NOT NULL IDENTITY PRIMARY KEY,
+	PostTitle VARCHAR(255) NOT NULL,
+	PostDate DATETIME NOT NULL,
+	Deleted BIT NOT NULL,
+	OwnerID int
+)
