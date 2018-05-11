@@ -1,33 +1,24 @@
-﻿using DAL.Models;
-using DAL.Services;
-using Dapper;
-using System;
-using System.Data;
-using System.Data.SqlClient;
+﻿using DAL.Services;
 using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 
 namespace DAL.Tests.Integration
 {
-    public class PostsTests : IntegrationTestBase, IDisposable
+    public class PostsTests : IntegrationTestBase
     {
-        private PostsService _service;
+        private readonly PostsRepository _repository;
 
         public PostsTests()
         {
-            _service = new PostsService(TestConnectionString);
+            _repository = new PostsRepository(TestConnectionString);
         }
 
         [Fact]
-        public void GetPosts_ShouldGetPosts()
+        public async Task GetPosts_ShouldGetPosts()
         {
-            Assert.True(_service.GetPosts().Count() > 1);
-        }
-
-        public void Dispose()
-        {
-            _service.Dispose();
+            Assert.True((await _repository.GetPosts()).Count() > 0);
         }
     }
 }
