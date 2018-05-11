@@ -33,5 +33,29 @@ namespace DAL.Services
                 throw new Exception(String.Format("{0}.WithConnection() experienced a SQL exception (not a timeout)", GetType().FullName), ex);
             }
         }
+
+
+        protected async Task<T> CallDatabaseAsync<T>(Func<IDbConnection, SqlTransaction, Task<T>> getData)
+        {
+            try
+            {
+                using (var connection = new SqlConnection(_connectionString))
+                {
+                    var sqlTransaction = connection.BeginTransaction();
+                    await connection.OpenAsync();
+                    var result = await getData(connection, sqlTransaction);
+                    sqlTransaction.Commit();
+                    return result;
+                }
+            }
+            catch (TimeoutException ex)
+            {
+                throw new Exception(String.Format("{0}.WithConnection() experienced a SQL timeout", GetType().FullName), ex);
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception(String.Format("{0}.WithConnection() experienced a SQL exception (not a timeout)", GetType().FullName), ex);
+            }
+        }
     }
 }
