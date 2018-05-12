@@ -14,7 +14,7 @@ namespace DAL.Services
             _connectionString = connectionString;
         }
 
-        protected async Task<T> CallDatabaseAsync<T>(Func<IDbConnection, Task<T>> queryDatabase)
+        protected async Task<T> GetAsync<T>(Func<IDbConnection, Task<T>> queryDatabase)
         {
             try
             {
@@ -35,7 +35,7 @@ namespace DAL.Services
         }
 
 
-        protected async Task<T> CallDatabaseAsync<T>(Func<IDbConnection, SqlTransaction, Task<T>> queryDatabase)
+        protected async Task<T> UpsertAsync<T>(Func<IDbConnection, SqlTransaction, Task<T>> queryDatabase)
         {
             try
             {
@@ -58,14 +58,17 @@ namespace DAL.Services
             }
         }
 
-        protected int CallDatabase(Func<IDbConnection, int> queryDatabase)
+        protected int Upsert(Func<IDbConnection, SqlTransaction, int> queryDatabase)
         {
             try
             {
                 using (var connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
-                    return queryDatabase(connection);
+                    var sqlTransaction = connection.BeginTransaction();
+                    var result = queryDatabase(connection, sqlTransaction);
+                    sqlTransaction.Commit();
+                    return result;
                 }
             }
             catch (TimeoutException ex)
@@ -78,17 +81,14 @@ namespace DAL.Services
             }
         }
 
-        protected int CallDatabase(Func<IDbConnection, SqlTransaction, int> queryDatabase)
+        protected void RunQuery(Func<IDbConnection, int> queryDatabase)
         {
             try
             {
                 using (var connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
-                    var sqlTransaction = connection.BeginTransaction();
-                    var result = queryDatabase(connection, sqlTransaction);
-                    sqlTransaction.Commit();
-                    return result;
+                    queryDatabase(connection);
                 }
             }
             catch (TimeoutException ex)

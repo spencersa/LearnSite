@@ -10,25 +10,27 @@ using Database.Queries;
 
 namespace DAL.Services
 {
-    public class PostsRepository : BaseRepository, IPostsRepository
+    public class PostsService : BaseRepository, IPostsService
     {
-        public PostsRepository(string connectionString) 
+        public PostsService(string connectionString) 
             : base(connectionString) { }
 
-        public async Task<List<Post>> GetPosts() => 
-            await CallDatabaseAsync(async c =>
+        public async Task<List<Post>> GetPosts(IEnumerable<int> ids) => 
+            await GetAsync(async c =>
                 {
-                    return (await c.QueryAsync<Post>(PostsQueries.GetPosts, commandType: CommandType.Text)).ToList();
+                    var parameters = new DynamicParameters();
+                    parameters.Add("@ids", ids);
+                    return (await c.QueryAsync<Post>(PostsQueries.GetPosts, parameters, commandType: CommandType.Text)).ToList();
                 });
 
         public async Task<int> UpdatePosts(List<Post> posts) => 
-            await CallDatabaseAsync(async(c, t) =>                                                   
+            await UpsertAsync(async(c, t) =>                                                   
                 {
                     return (await c.ExecuteAsync(PostsQueries.UpdatePost, posts, transaction: t));
                 });
 
         public async Task<int> InsertPosts(List<Post> posts) => 
-            await CallDatabaseAsync(async (c, t) =>                                            
+            await UpsertAsync(async (c, t) =>                                            
                 {
                     return (await c.ExecuteAsync(PostsQueries.InsertPosts, posts, transaction: t));
                 });

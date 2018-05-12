@@ -12,7 +12,8 @@ namespace Database.Queries
                     ,[PostDate]
                     ,[Deleted]
                     ,[OwnerID]
-            FROM [dbo].[tblPosts]";
+            FROM [dbo].[tblPosts]
+            WHERE Id IN @ids";
 
         public const string UpdatePost =
             @"UPDATE [dbo].[tblPosts]

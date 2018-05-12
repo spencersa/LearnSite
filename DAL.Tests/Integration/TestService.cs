@@ -11,11 +11,11 @@ using System.Linq;
 
 namespace DAL.Tests.Integration
 {
-    public class TestRepository : BaseRepository, IDisposable
+    public class TestService : BaseRepository, IDisposable
     {
         private readonly Fixture _fixture;
 
-        public TestRepository(string connectionString)
+        public TestService(string connectionString)
             : base(connectionString)
         {
             SetupDatabase();
@@ -24,7 +24,7 @@ namespace DAL.Tests.Integration
 
         public void SetupDatabase()
         {
-            CallDatabase(c =>
+            RunQuery(c =>
             {
                 return c.Execute(TestQueries.CreateAllTables, commandType: CommandType.Text);
             });
@@ -34,7 +34,7 @@ namespace DAL.Tests.Integration
         {
             var posts = _fixture.CreateMany<Post>(amount).ToList();
             seededPosts = posts;
-            CallDatabase((c, t) =>
+            Upsert((c, t) =>
             {
                 return c.Execute(PostsQueries.InsertPosts, posts, transaction: t);
             });
@@ -42,7 +42,7 @@ namespace DAL.Tests.Integration
 
         public void CleanUpDatabase()
         {
-            CallDatabase(c =>
+            RunQuery(c =>
             {
                 return c.Execute(TestQueries.DropAllTables, commandType: CommandType.Text);
             });

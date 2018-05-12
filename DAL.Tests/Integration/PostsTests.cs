@@ -12,14 +12,14 @@ namespace DAL.Tests.Integration
 {
     public class PostsTests : IntegrationTestBase, IDisposable
     {
-        private readonly PostsRepository _postsRepository;
-        private readonly TestRepository _testRepository;
+        private readonly PostsService _postsRepository;
+        private readonly TestService _testRepository;
         private readonly Fixture _fixture;
 
         public PostsTests()
         {
-            _testRepository = new TestRepository(TestConnectionString);
-            _postsRepository = new PostsRepository(TestConnectionString);
+            _testRepository = new TestService(TestConnectionString);
+            _postsRepository = new PostsService(TestConnectionString);
             _fixture = new Fixture();
         }
 
@@ -27,11 +27,17 @@ namespace DAL.Tests.Integration
         [InlineData(0)]
         [InlineData(1)]
         [InlineData(2)]
-        public async Task GetPosts_ShouldGetPost(int amountOfPosts)
+        public async Task GetPosts_ShouldGetPosts(int amountOfPosts)
         {
+            var ids = new List<int>();
+            for (int i = 0; i < amountOfPosts + 1; i++)
+            {
+                ids.Add(i + 1);
+            }
+
             _testRepository.SeedPosts(amountOfPosts, out List<Post> seededPosts);
 
-            var results = await _postsRepository.GetPosts();
+            var results = await _postsRepository.GetPosts(ids);
 
             Assert.Equal(amountOfPosts, results.Count());
 
@@ -46,7 +52,8 @@ namespace DAL.Tests.Integration
         [Fact]
         public async Task GetPosts_WithEmptyDatabase_ShouldNotGetAnyPosts()
         {
-            var results = await _postsRepository.GetPosts();
+            var ids = new List<int>();
+            var results = await _postsRepository.GetPosts(ids);
             Assert.Empty(results);
         }
 
@@ -88,7 +95,7 @@ namespace DAL.Tests.Integration
             var result = await _postsRepository.UpdatePosts(updatedPosts);
             Assert.Equal(amountOfPosts, result);
 
-            var posts = await _postsRepository.GetPosts();
+            var posts = await _postsRepository.GetPosts(updatedPosts.Select(x => x.Id).ToList());
 
             posts.Should().BeEquivalentTo(updatedPosts, config => 
             {
