@@ -10,5 +10,6 @@ namespace DAL.Interfaces
     {
         Task<List<Post>> GetPosts();
         Task<int> InsertPosts(List<Post> posts);
+        Task<int> UpdatePosts(List<Post> post);
     }
 }

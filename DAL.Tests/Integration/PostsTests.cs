@@ -3,6 +3,7 @@ using DAL.Models;
 using DAL.Services;
 using FluentAssertions;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -61,6 +62,40 @@ namespace DAL.Tests.Integration
             var result = await _postsRepository.InsertPosts(testPosts);
 
             Assert.Equal(amountOfPosts, result);
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(2)]
+        public async Task UpdatePosts_ShouldUpdatePosts(int amountOfPosts)
+        {
+            var testPosts = _fixture.CreateMany<Post>(amountOfPosts).ToList();
+            _testRepository.SeedPosts(testPosts);
+
+            var updatedPosts = new List<Post>();
+            for (int i = 0; i < amountOfPosts; i++)
+            {
+                Post updatedPost = new Post()
+                {
+                    Id = i + 1,
+                    PostDate = DateTime.Now,
+                    PostTitle = "TestTitle",
+                    OwnerId = 1,
+                    Deleted = false
+                };
+                updatedPosts.Add(updatedPost);
+            }
+
+            var result = await _postsRepository.UpdatePosts(updatedPosts);
+            Assert.Equal(amountOfPosts, result);
+
+            var posts = await _postsRepository.GetPosts();
+
+            posts.Should().BeEquivalentTo(updatedPosts, config => 
+            {
+                return config.Using<DateTime>(context => context.Subject.Should().BeCloseTo(context.Expectation)).WhenTypeIs<DateTime>();
+            });
         }
 
         public void Dispose()

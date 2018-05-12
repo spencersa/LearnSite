@@ -21,6 +21,12 @@ namespace DAL.Services
                     return (await c.QueryAsync<Post>(PostsQueries.GetPosts, commandType: CommandType.Text)).ToList();
                 });
 
+        public async Task<int> UpdatePosts(List<Post> posts) => 
+            await CallDatabaseAsync(async(c, t) =>                                                   
+                {
+                    return (await c.ExecuteAsync(PostsQueries.UpdatePost, posts, transaction: t));
+                });
+
         public async Task<int> InsertPosts(List<Post> posts) => 
             await CallDatabaseAsync(async (c, t) =>                                            
                 {

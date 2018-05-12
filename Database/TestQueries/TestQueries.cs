@@ -7,7 +7,7 @@ namespace Database.TestQueries
     public static class TestQueries
     {
         public const string CreateAllTables =
-            @"CREATE TABLE dbo.tblPosts (
+            @"CREATE TABLE [dbo].[tblPosts] (
 	          Id INT NOT NULL IDENTITY PRIMARY KEY,
 	          PostTitle VARCHAR(255) NOT NULL,
 	          PostDate DATETIME NOT NULL,
@@ -15,6 +15,6 @@ namespace Database.TestQueries
 	          OwnerID int)";
 
         public const string DropAllTables =
-            @"DROP TABLE dbo.tblPosts;";
+            @"DROP TABLE [dbo].[tblPosts];";
     }
 }
