@@ -29,14 +29,13 @@ namespace DAL.Tests.Integration
         [InlineData(2)]
         public async Task GetPosts_ShouldGetPost(int amountOfPosts)
         {
-            var testPosts = _fixture.CreateMany<Post>(amountOfPosts).ToList();
-            _testRepository.SeedPosts(testPosts);
+            _testRepository.SeedPosts(amountOfPosts, out List<Post> seededPosts);
 
             var results = await _postsRepository.GetPosts();
 
             Assert.Equal(amountOfPosts, results.Count());
 
-            results.Should().BeEquivalentTo(testPosts, config => 
+            results.Should().BeEquivalentTo(seededPosts, config => 
             {
                 config.Excluding(property => property.Id);
                 config.Using<DateTime>(context => context.Subject.Should().BeCloseTo(context.Expectation)).WhenTypeIs<DateTime>();
@@ -70,8 +69,7 @@ namespace DAL.Tests.Integration
         [InlineData(2)]
         public async Task UpdatePosts_ShouldUpdatePosts(int amountOfPosts)
         {
-            var testPosts = _fixture.CreateMany<Post>(amountOfPosts).ToList();
-            _testRepository.SeedPosts(testPosts);
+            _testRepository.SeedPosts(amountOfPosts, out _);
 
             var updatedPosts = new List<Post>();
             for (int i = 0; i < amountOfPosts; i++)
