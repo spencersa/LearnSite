@@ -1,5 +1,6 @@
 ﻿using DAL.Models;
 using DAL.Services;
+using FluentAssertions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,18 +24,40 @@ namespace DAL.Tests.Integration
         [Fact]
         public async Task GetPosts_ShouldGetPosts()
         {
-            List<Post> testPosts = new List<Post>
+
+            Post testPost = new Post
             {
-                new Post
-                {
-                    PostDate = DateTime.UtcNow,
-                    Deleted = false,
-                    PostTitle = "Test Title"               
-                }
+                Id = 1,
+                PostDate = DateTime.UtcNow.Date,
+                Deleted = false,
+                PostTitle = "Test Title"
             };
+
+            List<Post> testPosts = new List<Post> { testPost };
             _testRepository.SeedPosts(testPosts);
 
-            Assert.True((await _postsRepository.GetPosts()).Count() > 0);
+            var results = await _postsRepository.GetPosts();
+
+            Assert.Single(results);
+            results.Should().BeEquivalentTo(testPosts);
+        }
+
+        [Fact]
+        public async Task InsertPosts_ShouldInsertPosts()
+        {
+            Post testPost = new Post
+            {
+                Id = 1,
+                PostDate = DateTime.UtcNow.Date,
+                Deleted = false,
+                PostTitle = "Test Title"
+            };
+
+            List<Post> testPosts = new List<Post> { testPost };
+
+            var result = await _postsRepository.InsertPosts(testPosts);
+
+            Assert.Equal(1, result);
         }
 
         public void Dispose()

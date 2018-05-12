@@ -41,8 +41,8 @@ namespace DAL.Services
             {
                 using (var connection = new SqlConnection(_connectionString))
                 {
-                    var sqlTransaction = connection.BeginTransaction();
                     await connection.OpenAsync();
+                    var sqlTransaction = connection.BeginTransaction();
                     var result = await queryDatabase(connection, sqlTransaction);
                     sqlTransaction.Commit();
                     return result;

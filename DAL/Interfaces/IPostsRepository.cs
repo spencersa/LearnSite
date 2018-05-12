@@ -9,6 +9,6 @@ namespace DAL.Interfaces
     public interface IPostsRepository
     {
         Task<List<Post>> GetPosts();
-        Task InsertPosts(List<Post> posts);
+        Task<int> InsertPosts(List<Post> posts);
     }
 }
