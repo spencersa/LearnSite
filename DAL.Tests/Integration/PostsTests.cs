@@ -1,12 +1,11 @@
-﻿using DAL.Models;
+﻿using AutoFixture;
+using DAL.Models;
 using DAL.Services;
 using FluentAssertions;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
-
 
 namespace DAL.Tests.Integration
 {
@@ -14,50 +13,54 @@ namespace DAL.Tests.Integration
     {
         private readonly PostsRepository _postsRepository;
         private readonly TestRepository _testRepository;
+        private readonly Fixture _fixture;
 
         public PostsTests()
         {
             _testRepository = new TestRepository(TestConnectionString);
             _postsRepository = new PostsRepository(TestConnectionString);
+            _fixture = new Fixture();
         }
 
-        [Fact]
-        public async Task GetPosts_ShouldGetPosts()
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(2)]
+        public async Task GetPosts_ShouldGetPost(int amountOfPosts)
         {
-
-            Post testPost = new Post
-            {
-                Id = 1,
-                PostDate = DateTime.UtcNow.Date,
-                Deleted = false,
-                PostTitle = "Test Title"
-            };
-
-            List<Post> testPosts = new List<Post> { testPost };
+            var testPosts = _fixture.CreateMany<Post>(amountOfPosts).ToList();
             _testRepository.SeedPosts(testPosts);
 
             var results = await _postsRepository.GetPosts();
 
-            Assert.Single(results);
-            results.Should().BeEquivalentTo(testPosts);
+            Assert.Equal(amountOfPosts, results.Count());
+
+            results.Should().BeEquivalentTo(testPosts, config => 
+            {
+                config.Excluding(property => property.Id);
+                config.Using<DateTime>(context => context.Subject.Should().BeCloseTo(context.Expectation)).WhenTypeIs<DateTime>();
+                return config;
+            });
         }
 
         [Fact]
-        public async Task InsertPosts_ShouldInsertPosts()
+        public async Task GetPosts_WithEmptyDatabase_ShouldNotGetAnyPosts()
         {
-            Post testPost = new Post
-            {
-                Id = 1,
-                PostDate = DateTime.UtcNow.Date,
-                Deleted = false,
-                PostTitle = "Test Title"
-            };
+            var results = await _postsRepository.GetPosts();
+            Assert.Empty(results);
+        }
 
-            List<Post> testPosts = new List<Post> { testPost };
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(2)]
+        public async Task InsertPosts_ShouldInsertPost(int amountOfPosts)
+        {
+            var testPosts = _fixture.CreateMany<Post>(amountOfPosts).ToList();
 
             var result = await _postsRepository.InsertPosts(testPosts);
 
-            Assert.Equal(1, result);
+            Assert.Equal(amountOfPosts, result);
         }
 
         public void Dispose()
