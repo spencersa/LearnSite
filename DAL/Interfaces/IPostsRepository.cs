@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DAL.Interfaces
 {
-    public interface IPostsService
+    public interface IPostsRepository
     {
         Task<List<Post>> GetPosts();
         Task InsertPosts(List<Post> posts);

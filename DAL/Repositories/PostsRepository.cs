@@ -10,7 +10,7 @@ using Database.Queries;
 
 namespace DAL.Services
 {
-    public class PostsRepository : BaseRepository, IPostsService
+    public class PostsRepository : BaseRepository, IPostsRepository
     {
         public PostsRepository(string connectionString) 
             : base(connectionString) { }
