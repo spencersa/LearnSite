@@ -8,13 +8,15 @@ namespace DAL.Services
     public class BaseRepository
     {
         private readonly string _connectionString;
+        private const string SqlTimeoutErrorMessage = "experienced a SQL timeout";
+        private const string SqlExceptionErrorMessage = "experienced a SQL exception (not a timeout)";
 
         protected BaseRepository(string connectionString)
         {
             _connectionString = connectionString;
         }
 
-        protected async Task<T> GetAsync<T>(Func<IDbConnection, Task<T>> queryDatabase)
+        protected async Task<T> QueryAsync<T>(Func<IDbConnection, Task<T>> queryDatabase)
         {
             try
             {
@@ -26,11 +28,11 @@ namespace DAL.Services
             }
             catch (TimeoutException ex)
             {
-                throw new Exception(String.Format("{0}.WithConnection() experienced a SQL timeout", GetType().FullName), ex);
+                throw new Exception(($"{GetType().FullName} {SqlTimeoutErrorMessage}"), ex);
             }
             catch (SqlException ex)
             {
-                throw new Exception(String.Format("{0}.WithConnection() experienced a SQL exception (not a timeout)", GetType().FullName), ex);
+                throw new Exception(($"{GetType().FullName} {SqlExceptionErrorMessage}"), ex);
             }
         }
 
@@ -50,11 +52,11 @@ namespace DAL.Services
             }
             catch (TimeoutException ex)
             {
-                throw new Exception(String.Format("{0}.WithConnection() experienced a SQL timeout", GetType().FullName), ex);
+                throw new Exception(($"{GetType().FullName} {SqlTimeoutErrorMessage}"), ex);
             }
             catch (SqlException ex)
             {
-                throw new Exception(String.Format("{0}.WithConnection() experienced a SQL exception (not a timeout)", GetType().FullName), ex);
+                throw new Exception(($"{GetType().FullName} {SqlExceptionErrorMessage}"), ex);
             }
         }
 
@@ -73,31 +75,31 @@ namespace DAL.Services
             }
             catch (TimeoutException ex)
             {
-                throw new Exception(String.Format("{0}.WithConnection() experienced a SQL timeout", GetType().FullName), ex);
+                throw new Exception(($"{GetType().FullName} {SqlTimeoutErrorMessage}"), ex);
             }
             catch (SqlException ex)
             {
-                throw new Exception(String.Format("{0}.WithConnection() experienced a SQL exception (not a timeout)", GetType().FullName), ex);
+                throw new Exception(($"{GetType().FullName} {SqlExceptionErrorMessage}"), ex);
             }
         }
 
-        protected void RunQuery(Func<IDbConnection, int> queryDatabase)
+        protected T Query<T>(Func<IDbConnection, T> queryDatabase)
         {
             try
             {
                 using (var connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
-                    queryDatabase(connection);
+                    return queryDatabase(connection);
                 }
             }
             catch (TimeoutException ex)
             {
-                throw new Exception(String.Format("{0}.WithConnection() experienced a SQL timeout", GetType().FullName), ex);
+                throw new Exception(($"{GetType().FullName} {SqlTimeoutErrorMessage}"), ex);
             }
             catch (SqlException ex)
             {
-                throw new Exception(String.Format("{0}.WithConnection() experienced a SQL exception (not a timeout)", GetType().FullName), ex);
+                throw new Exception(($"{GetType().FullName} {SqlExceptionErrorMessage}"), ex);
             }
         }
     }
