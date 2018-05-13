@@ -6,7 +6,7 @@ namespace Database.Queries
 {
     public static class PostsQueries
     {
-        public const string GetPosts =
+        public const string GetPostsById =
             @"SELECT [Id]
                     ,[PostTitle]
                     ,[PostDate]
@@ -14,6 +14,15 @@ namespace Database.Queries
                     ,[OwnerID]
             FROM [dbo].[tblPosts]
             WHERE Id IN @ids";
+
+        public const string GetTopPosts =
+            @"SELECT TOP (@amount) [Id]
+                    ,[PostTitle]
+                    ,[PostDate]
+                    ,[Deleted]
+                    ,[OwnerID]
+            FROM [dbo].[tblPosts]
+            ORDER BY PostDate desc";
 
         public const string UpdatePost =
             @"UPDATE [dbo].[tblPosts]

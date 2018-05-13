@@ -1,9 +1,11 @@
 ﻿using AutoFixture;
+using DAL.Configurations;
 using DAL.Models;
 using DAL.Services;
 using Dapper;
 using Database.Queries;
 using Database.TestQueries;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -15,8 +17,8 @@ namespace DAL.Tests.Integration
     {
         private readonly Fixture _fixture;
 
-        public TestService(string connectionString)
-            : base(connectionString)
+        public TestService(IOptions<ConnectionConfiguration> connectionConfiguration)
+            : base(connectionConfiguration.Value.LearnSiteConnection)
         {
             SetupDatabase();
             _fixture = new Fixture();
