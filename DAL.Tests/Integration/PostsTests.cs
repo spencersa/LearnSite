@@ -18,8 +18,8 @@ namespace DAL.Tests.Integration
 
         public PostsTests()
         {
-            _testRepository = new TestService(TestConnectionString);
-            _postsRepository = new PostsService(TestConnectionString);
+            _testRepository = new TestService(TestConnectionConfiguration);
+            _postsRepository = new PostsService(TestConnectionConfiguration);
             _fixture = new Fixture();
         }
 

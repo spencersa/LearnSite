@@ -2,17 +2,19 @@
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using DAL.Configurations;
 using DAL.Interfaces;
 using DAL.Models;
 using Dapper;
 using Database.Queries;
+using Microsoft.Extensions.Options;
 
 namespace DAL.Services
 {
     public class PostsService : BaseRepository, IPostsService
     {
-        public PostsService(string connectionString) 
-            : base(connectionString) { }
+        public PostsService(IOptions<ConnectionConfiguration> connectionConfiguration) 
+            : base(connectionConfiguration.Value.LearnSiteConnection) { }
 
         public async Task<List<Post>> GetPosts(IEnumerable<int> ids) => 
             await QueryAsync(async c =>
