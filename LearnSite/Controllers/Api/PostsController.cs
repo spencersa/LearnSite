@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DAL.Interfaces;
+using DAL.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LearnSite.Controllers.Api
 {
+    [AllowAnonymous]
     public class PostsController : BaseApiController
     {
         private readonly IPostsService _postsService;
@@ -17,18 +20,10 @@ namespace LearnSite.Controllers.Api
             _postsService = postsService;
         }
 
-        // GET: api/Posts
-        [HttpGet]
-        public IEnumerable<string> Get()
+        [HttpGet("{amount}", Name = "Get")]
+        public async Task<List<Post>> Get(int amount)
         {
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET: api/Posts/5
-        [HttpGet("{id}", Name = "Get")]
-        public string Get(int id)
-        {
-            return "value";
+            return await _postsService.GetMostRecentPosts(amount);
         }
         
         // POST: api/Posts
@@ -43,10 +38,5 @@ namespace LearnSite.Controllers.Api
         {
         }
         
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
     }
 }

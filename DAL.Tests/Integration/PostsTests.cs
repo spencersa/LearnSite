@@ -103,6 +103,60 @@ namespace DAL.Tests.Integration
             });
         }
 
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(2)]
+        public async Task GetMostRecentPosts_ShouldGetPosts(int amountOfPosts)
+        {
+            var ids = new List<int>();
+            for (int i = 0; i < amountOfPosts + 1; i++)
+            {
+                ids.Add(i + 1);
+            }
+
+            _testRepository.SeedPosts(amountOfPosts, out List<Post> seededPosts);
+
+            var results = await _postsRepository.GetMostRecentPosts(amountOfPosts);
+
+            Assert.Equal(amountOfPosts, results.Count());
+
+            results.Should().BeEquivalentTo(seededPosts, config =>
+            {
+                config.Excluding(property => property.Id);
+                config.Using<DateTime>(context => context.Subject.Should().BeCloseTo(context.Expectation)).WhenTypeIs<DateTime>();
+                return config;
+            });
+        }
+
+        [Theory]
+        [InlineData(0, 1)]
+        [InlineData(1, 2)]
+        [InlineData(2, 10)]
+        public async Task GetMostRecentPosts_ShouldGetPostsWithinAmount(int amountOfPosts, int amountOfPostsSeeded)
+        {
+            var ids = new List<int>();
+            for (int i = 0; i < amountOfPosts + 1; i++)
+            {
+                ids.Add(i + 1);
+            }
+
+            _testRepository.SeedPosts(amountOfPostsSeeded, out List<Post> seededPosts);
+
+            var results = await _postsRepository.GetMostRecentPosts(amountOfPosts);
+
+            Assert.Equal(amountOfPosts, results.Count());
+
+            var expectedPosts = seededPosts.OrderByDescending(x => x.PostDate).Take(amountOfPosts);
+
+            results.Should().BeEquivalentTo(expectedPosts, config =>
+            {
+                config.Excluding(property => property.Id);
+                config.Using<DateTime>(context => context.Subject.Should().BeCloseTo(context.Expectation)).WhenTypeIs<DateTime>();
+                return config;
+            });
+        }
+
         public void Dispose()
         {
             _testRepository.Dispose();

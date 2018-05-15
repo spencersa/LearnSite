@@ -21,8 +21,16 @@ namespace DAL.Services
                 {
                     var parameters = new DynamicParameters();
                     parameters.Add("@ids", ids);
-                    return (await c.QueryAsync<Post>(PostsQueries.GetPosts, parameters, commandType: CommandType.Text)).ToList();
+                    return (await c.QueryAsync<Post>(PostsQueries.GetPostsById, parameters, commandType: CommandType.Text)).ToList();
                 });
+
+        public async Task<List<Post>> GetMostRecentPosts(int amount) => 
+            await QueryAsync(async c =>                                                                   
+            {
+                var parameters = new DynamicParameters();
+                parameters.Add("@amount", amount);
+                return (await c.QueryAsync<Post>(PostsQueries.GetTopPosts, parameters, commandType: CommandType.Text)).ToList();
+            });
 
         public async Task<int> UpdatePosts(List<Post> posts) => 
             await UpsertAsync(async(c, t) =>                                                   
