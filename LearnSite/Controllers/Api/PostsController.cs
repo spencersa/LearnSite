@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using DAL.Interfaces;
 using DAL.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LearnSite.Controllers.Api
 {
-    [AllowAnonymous]
     public class PostsController : BaseApiController
     {
         private readonly IPostsService _postsService;
@@ -20,8 +15,8 @@ namespace LearnSite.Controllers.Api
             _postsService = postsService;
         }
 
-        [HttpGet("{amount}", Name = "Get")]
-        public async Task<List<Post>> Get(int amount)
+        [HttpGet("{amount}", Name = "getMostRecentPosts")]
+        public async Task<List<Post>> GetMostRecentPosts(int amount)
         {
             return await _postsService.GetMostRecentPosts(amount);
         }
