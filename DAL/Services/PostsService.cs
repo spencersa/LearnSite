@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using DAL.Configurations;
@@ -18,7 +17,7 @@ namespace DAL.Services
             : base(connectionConfiguration.Value.LearnSiteConnection) { }
 
         public async Task<List<Post>> GetPosts(IEnumerable<int> ids) => 
-            await GetAsync(async c =>
+            await QueryAsync(async c =>
                 {
                     var parameters = new DynamicParameters();
                     parameters.Add("@ids", ids);

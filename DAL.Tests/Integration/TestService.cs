@@ -26,7 +26,7 @@ namespace DAL.Tests.Integration
 
         public void SetupDatabase()
         {
-            RunQuery(c =>
+            Query(c =>
             {
                 return c.Execute(TestQueries.CreateAllTables, commandType: CommandType.Text);
             });
@@ -44,7 +44,7 @@ namespace DAL.Tests.Integration
 
         public void CleanUpDatabase()
         {
-            RunQuery(c =>
+            Query(c =>
             {
                 return c.Execute(TestQueries.DropAllTables, commandType: CommandType.Text);
             });
